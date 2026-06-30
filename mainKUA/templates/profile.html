@@ -1,0 +1,339 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Профиль студента</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .user-info {
+            text-align: right;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        fieldset {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            padding: 15px;
+        }
+        legend {
+            font-weight: bold;
+            color: #555;
+            padding: 0 10px;
+        }
+        .form-group {
+            margin-bottom: 12px;
+        }
+        label {
+            display: inline-block;
+            width: 220px;
+            font-weight: bold;
+            vertical-align: top;
+            padding-top: 8px;
+        }
+        input, select {
+            width: 400px;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        input[type="text"], input[type="number"], input[type="date"] {
+            width: 400px;
+        }
+        .button-group {
+            text-align: center;
+            margin-top: 20px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .logout-btn {
+            background-color: #f44336;
+        }
+        .logout-btn:hover {
+            background-color: #da190b;
+        }
+        .messages {
+            margin-bottom: 20px;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+        .warning {
+            background-color: #fff3cd;
+            color: #856404;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 15px;
+        }
+        hr {
+            margin: 20px 0;
+        }
+        .note {
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+            margin-top: 20px;
+        }
+        select[multiple] {
+            height: auto;
+            min-height: 100px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Профиль студента</h1>
+        
+        <div class="user-info">
+            <span>Пользователь: <strong>{{ user.username }}</strong></span>
+        </div>
+        
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <div class="{% if message.tags == 'success' %}success{% else %}error{% endif %}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        
+        <form method="post">
+            {% csrf_token %}
+            
+            <fieldset>
+                <legend>ФИО студента</legend>
+                <div class="form-group">
+                    <label>Фамилия:</label>
+                    <input type="text" name="familia" value="{{ user_report.familia|default:'' }}">
+                </div>
+                <div class="form-group">
+                    <label>Имя:</label>
+                    <input type="text" name="name" value="{{ user_report.name|default:'' }}">
+                </div>
+                <div class="form-group">
+                    <label>Отчество:</label>
+                    <input type="text" name="otchestvo" value="{{ user_report.otchestvo|default:'' }}">
+                </div>
+            </fieldset>
+            
+            <fieldset>
+                <legend>Информация о практике</legend>
+                <div class="form-group">
+                    <label>Тип практики:</label>
+                    <select name="tip">
+                        <option value="">-- Не выбрано --</option>
+                        {% for t in prac_types %}
+                        <option value="{{ t.type_name }}" {% if user_report.prac_type and user_report.prac_type.type_name == t.type_name %}selected{% endif %}>
+                            {{ t.type_name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Профессиональный модуль:</label>
+                    <select name="module">
+                        <option value="">-- Не выбрано --</option>
+                        {% for m in modules %}
+                        <option value="{{ m.module_name }}" {% if user_report.module and user_report.module.id_module == m.id_module %}selected{% endif %}>
+                            {{ m.module_name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Специальность:</label>
+                    <select name="specialization">
+                        <option value="">-- Не выбрано --</option>
+                        {% for s in specializations %}
+                        <option value="{{ s.spec_name }}" {% if user_report.specialization and user_report.specialization.id_spec == s.id_spec %}selected{% endif %}>
+                            {{ s.spec_name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Курс:</label>
+                    <input type="number" name="kurs" value="{{ user_report.kurs|default:'' }}">
+                </div>
+                
+                <div class="form-group">
+                    <label>Группа:</label>
+                    <select name="group">
+                        <option value="">-- Не выбрано --</option>
+                        {% for g in groups %}
+                        <option value="{{ g.group_name }}" {% if user_report.group and user_report.group.id_group == g.id_group %}selected{% endif %}>
+                            {{ g.group_name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <legend>Период практики</legend>
+                <div class="form-group">
+                    <label>Дата начала:</label>
+                    <input type="date" name="begin_date" value="{{ begin_date_for_input }}">
+                </div>
+                <div class="form-group">
+                    <label>Дата окончания:</label>
+                    <input type="date" name="finish_date" value="{{ finish_date_for_input }}">
+                </div>
+            </fieldset>
+            
+            <fieldset>
+                <legend>Руководители</legend>
+                <div class="form-group">
+                    <label>Руководитель от техникума (ФИО):</label>
+                    <input type="text" name="head1" value="{{ user_report.head1|default:'' }}" size="40">
+                </div>
+                
+                <div class="form-group">
+                    <label>Должность руководителя:</label>
+                    <input type="text" name="head2" value="{{ user_report.head2|default:'' }}" size="40">
+                </div>
+                
+                <div class="form-group">
+                    <label>Руководитель от организации:</label>
+                    <input type="text" name="ruc_pract" value="{{ user_report.ruc_pract|default:'' }}" size="40">
+                </div>
+                
+                <div class="form-group">
+                    <label>Год:</label>
+                    <input type="number" name="year" value="{{ user_report.year|default:'' }}">
+                </div>
+            </fieldset>
+            
+            <fieldset>
+                <legend>МДК (Междисциплинарные курсы)</legend>
+                <div class="form-group">
+                    <label>МДК 01.01:</label>
+                    <input type="text" name="mdk1" value="{{ user_report.mdk1|default:'' }}" size="50">
+                </div>
+                
+                <div class="form-group">
+                    <label>МДК 01.02:</label>
+                    <input type="text" name="mdk2" value="{{ user_report.mdk2|default:'' }}" size="50">
+                </div>
+                
+                <div class="form-group">
+                    <label>МДК 01.03:</label>
+                    <input type="text" name="mdk3" value="{{ user_report.mdk3|default:'' }}" size="50">
+                </div>
+                
+                <div class="form-group">
+                    <label>МДК 01.04:</label>
+                    <input type="text" name="mdk4" value="{{ user_report.mdk4|default:'' }}" size="50">
+                </div>
+                
+                <div class="form-group">
+                    <label>Количество часов:</label>
+                    <input type="number" name="hours" value="{{ user_report.hours|default:'' }}">
+                </div>
+            </fieldset>
+            
+            <div class="button-group">
+                <button type="submit">💾 Сохранить данные</button>
+            </div>
+        </form>
+        
+        <hr>
+        
+        <div class="button-group">
+            <form method="post" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" name="generate_title" {% if not has_title_template %}disabled{% endif %}>
+                    📄 Сгенерировать титульный лист
+                </button>
+            </form>
+            
+            <form method="post" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" name="generate_diary" {% if not has_diary_template %}disabled{% endif %}>
+                    📓 Сгенерировать дневник
+                </button>
+            </form>
+            
+            <form method="post" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" name="generate_task" {% if not has_task_template %}disabled{% endif %}>
+                    📋 Сгенерировать задание
+                </button>
+            </form>
+        </div>
+        
+        {% if not has_title_template or not has_diary_template or not has_task_template %}
+        <div class="warning">
+            <strong>Внимание!</strong> Некоторые шаблоны не загружены.<br>
+            {% if user.is_staff %}
+                Загрузите шаблоны в <a href="/admin/mainKUA/doctemplate/add/">админ-панели</a>.
+            {% else %}
+                Обратитесь к администратору для загрузки шаблонов.
+            {% endif %}
+        </div>
+        {% endif %}
+        
+        <hr>
+        
+        <div class="button-group">
+            <a href="{% url 'logout' %}">
+                <button type="button" class="logout-btn">🚪 Выйти</button>
+            </a>
+        </div>
+        
+        <div class="note">
+            Заполните данные о практике, затем нажмите кнопку для генерации нужного документа. Файл скачается автоматически.
+        </div>
+    </div>
+</body>
+</html>

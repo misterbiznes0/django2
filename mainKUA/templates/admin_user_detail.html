@@ -1,0 +1,36 @@
+{% extends "admin_panel.html" %}
+
+{% block content %}
+<div class="section">
+    <h2>Детали пользователя: {{ user.username }}</h2>
+    
+    <h3>Информация о пользователе</h3>
+    <table class="data-table">
+        <tr><th>ID</th><td>{{ user.id }}</td></tr>
+        <tr><th>Логин</th><td>{{ user.username }}</td></tr>
+        <tr><th>Email</th><td>{{ user.email }}</td></tr>
+        <tr><th>Имя</th><td>{{ user.first_name }}</td></tr>
+        <tr><th>Фамилия</th><td>{{ user.last_name }}</td></tr>
+        <tr><th>Дата регистрации</th><td>{{ user.date_joined }}</td></tr>
+        <tr><th>Статус персонала</th><td>{{ user.is_staff|yesno:"Да,Нет" }}</td></tr>
+    </table>
+    
+    <h3>Данные практики</h3>
+    {% if user_data %}
+    <table class="data-table">
+        <tr><th>Тип практики</th><td>{{ user_data.tip }}</td></tr>
+        <tr><th>ФИО студента</th><td>{{ user_data.fio }}</td></tr>
+        <tr><th>Модуль</th><td>{{ user_data.module }}</td></tr>
+        <tr><th>Специализация</th><td>{{ user_data.specialization }}</td></tr>
+        <tr><th>Курс</th><td>{{ user_data.kurs }}</td></tr>
+        <tr><th>Организация</th><td>{{ user_data.name_org }}</td></tr>
+        <!-- Добавьте остальные поля по необходимости -->
+    </table>
+    {% else %}
+    <p>Нет данных о практике</p>
+    {% endif %}
+    
+    <a href="/admin-panel/" class="btn btn-primary">Назад</a>
+    <a href="/admin/user/{{ user.id }}/export/" class="btn btn-primary">Экспорт в JSON</a>
+</div>
+{% endblock %}
